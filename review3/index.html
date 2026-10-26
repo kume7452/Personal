@@ -273,8 +273,7 @@ const UNITS=[
  {id:'u2',sec:'ma',sub:'ma',t:'二、四位數的加減',d:'直式加減・應用題・估算',make:()=>mixG(U2,6,WU2,4)},
  {id:'u3',sec:'ma',sub:'ma',t:'三、毫米',d:'公分毫米換算・量長度・長度計算',make:()=>mixG(U3,7,WU3,3)},
  {id:'u4',sec:'ma',sub:'ma',t:'四、乘法',d:'直式乘法・應用題・連乘・估算',make:()=>mixG(U4,6,WU4,4)},
- {id:'u5',sec:'ma',sub:'ma',t:'五、角',d:'銳角直角鈍角・比大小・時鐘・正方形長方形',make:()=>mixG(U5,8,WU5,2)},
- {id:'em',sec:'ex',sub:'ma',t:'數學期中模擬考',d:'20 題・第 1–5 單元',make:()=>mixG([...U1,...U2,...U3,...U4,...U5],13,[...WU1,...WU2,...WU3,...WU4,...WU5],7)}
+ {id:'em',sec:'ex',sub:'ma',t:'數學期中模擬考',d:'20 題・第 1–4 單元',make:()=>mixG([...U1,...U2,...U3,...U4],13,[...WU1,...WU2,...WU3,...WU4],7)}
 ];
 
 /* ---------- 手寫板 ---------- */
@@ -337,7 +336,7 @@ function home(){
  const best=store.get('g3best',{}),wb=book();
  const card=u=>`<button class="unit ${u.sub}" data-u="${u.id}"><b>${u.t}</b><small>${u.d}</small><span class="stars">${starStr(best[u.id]||0)}</span></button>`;
  const sec=(k,name,col)=>`<div class="sec"><i style="background:${col}"></i>${name}</div><div class="units">${UNITS.filter(u=>u.sec===k).map(card).join('')}</div>`;
- app.innerHTML=`${document.fullscreenEnabled?'<button class="fs" id="fs">⛶ 全螢幕</button>':''}<h1>小三複習樂園</h1><p class="sub">三上期中考複習｜數學康軒第 1–5 單元・選擇＋手寫，題目每次都會換</p>
+ app.innerHTML=`${document.fullscreenEnabled?'<button class="fs" id="fs">⛶ 全螢幕</button>':''}<h1>小三複習樂園</h1><p class="sub">三上期中考複習｜數學康軒第 1–4 單元・選擇＋手寫，題目每次都會換</p>
  ${sec('ma','數學（康軒 3上）','var(--ma)')}${sec('ex','期中模擬考','var(--bad)')}
  <div class="sec"><i style="background:var(--bad)"></i>錯題本</div><div class="units"><button class="unit rv" data-u="rv" ${wb.length?'':'disabled'}><b>錯題再練習</b><small>${wb.length?`還有 ${wb.length} 題要練，答對就會移出錯題本`:'目前沒有錯題，太棒了'}</small></button></div>
  <p class="note">使用說明：<br>・手寫題直接用手指或觸控筆把答案寫在格子裡，多位數從左寫到右。<br>・在 claude.ai 開啟時，可以按「請老師批改」讓 Claude 判讀字跡；也可以按「自己對答案」。<br>・成績與錯題只存在這台裝置的瀏覽器。</p>`;
