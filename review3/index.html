@@ -1,0 +1,460 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="小三複習樂園"><meta name="theme-color" content="#EEF3F6">
+<style>[hidden]{display:none!important}img{max-width:100%}:root{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
+.fs{float:right;border:2px solid var(--line);background:var(--card);border-radius:12px;padding:6px 12px;font-size:14px;margin-top:10px}</style>
+</head><body>
+<title>小三複習樂園</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Noto+Sans+TC:wght@500;700;900&display=swap">
+<style>
+/* Layout: 作業簿風格，首頁兩科單元卡 → 單題作答卡 → 星星結算 */
+:root{
+  --bg:#EEF3F6; --card:#FFFFFF; --ink:#1E3A4C; --muted:#5E7584; --line:#D3DFE6;
+  --accent:#F2C230; --zh:#4A6FD1; --ma:#E0861E; --ok:#2E9D6A; --bad:#D9483B; --wood:#E9C08A;
+  --okbg:#E3F4EC; --badbg:#FBE7E4;
+  --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  --f-num:"Fredoka","Noto Sans TC",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#13202A; --card:#1C2D3A; --ink:#E7F0F5; --muted:#9DB3C1; --line:#2C4152;
+  --accent:#F2C230; --zh:#7F9DF0; --ma:#F2A24A; --ok:#4CC38A; --bad:#F06A5C; --wood:#B98E5C;
+  --okbg:#173A2C; --badbg:#3F2220; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#13202A; --card:#1C2D3A; --ink:#E7F0F5; --muted:#9DB3C1; --line:#2C4152;
+  --accent:#F2C230; --zh:#7F9DF0; --ma:#F2A24A; --ok:#4CC38A; --bad:#F06A5C; --wood:#B98E5C;
+  --okbg:#173A2C; --badbg:#3F2220; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 40px}
+#app{max-width:720px;margin:0 auto}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+h1{font-size:28px;font-weight:900;margin:8px 0 2px;text-wrap:balance}
+.sub{color:var(--muted);font-size:14px;margin:0 0 20px}
+.sec{display:flex;align-items:center;gap:8px;font-weight:900;font-size:18px;margin:22px 0 10px}
+.sec i{width:12px;height:12px;border-radius:3px;display:inline-block}
+.units{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.unit{background:var(--card);border:2px solid var(--line);border-radius:16px;padding:14px 16px;text-align:left;display:flex;flex-direction:column;gap:4px;transition:transform .15s}
+.unit:hover{transform:translateY(-2px)}
+.unit b{font-size:18px}
+.unit small{color:var(--muted);font-size:13px}
+.unit .stars{font-size:16px;letter-spacing:2px;color:var(--accent)}
+.unit .stars .off{color:var(--line)}
+.unit.zh{border-bottom:6px solid var(--zh)} .unit.ma{border-bottom:6px solid var(--ma)}
+.unit.rv{border-bottom:6px solid var(--bad)}
+.unit:disabled{opacity:.55;cursor:default;transform:none}
+.bar{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.x{width:40px;height:40px;border-radius:12px;border:2px solid var(--line);background:var(--card);font-size:18px;flex:none}
+.prog{flex:1;height:12px;background:var(--line);border-radius:99px;overflow:hidden}
+.prog span{display:block;height:100%;background:var(--accent);transition:width .3s}
+.cnt{font-family:var(--f-num);font-weight:700;font-variant-numeric:tabular-nums;min-width:48px;text-align:right}
+.qcard{background:var(--card);border:2px solid var(--line);border-radius:20px;padding:18px 16px;text-align:center}
+.tag{display:inline-block;font-size:12px;font-weight:700;padding:2px 10px;border-radius:99px;color:#fff;margin-bottom:6px}
+.tag.zh{background:var(--zh)} .tag.ma{background:var(--ma)}
+.ask{font-size:20px;font-weight:700;margin:4px 0 10px;text-wrap:balance}
+.speak{border:2px solid var(--line);background:transparent;border-radius:99px;padding:2px 12px;font-size:14px;color:var(--muted);margin-bottom:6px}
+.vs{display:inline-flex;flex-flow:column wrap-reverse;align-items:center;align-content:center;gap:.35em .8em;vertical-align:middle;line-height:1;font-weight:700}
+.sy{display:flex;flex-direction:column;align-items:center;padding:0 .55em 0 .1em}
+.sy b{position:relative;display:block;height:1.1em;line-height:1.1em}
+.sy .tn{position:absolute;left:100%;top:-.2em;font-style:normal;font-size:.8em;margin-left:.02em}
+.sy .nt{display:block;font-style:normal;height:.5em;line-height:.4em}
+.pu{display:block;height:1.1em;line-height:1.1em}
+.vb{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;min-width:1.8em;height:2.6em;border:3px dashed var(--accent);border-radius:8px;color:var(--zh);padding:0}
+.vb.filled{height:auto;border-style:solid;padding:.25em 0}
+.choice .vs{font-size:28px}
+.ex{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:16px}
+.ex .vs{font-size:22px}
+.eq{font-size:40px;display:flex;justify-content:center;align-items:center;gap:12px;flex-wrap:wrap}
+.eq i{font-style:normal;color:var(--muted);font-size:30px}
+.blank{display:inline-block;min-width:2.2em;border-bottom:3px solid var(--accent);color:var(--zh);padding:0 4px}
+.sent{font-size:26px;margin:10px 0;display:flex;justify-content:center}
+.pic{font-size:72px;line-height:1.2;margin:4px 0}
+.num{font-family:var(--f-num);font-weight:700;font-variant-numeric:tabular-nums}
+.big{font-size:34px;color:var(--ma)}
+.grp{display:grid;grid-template-columns:repeat(5,auto);gap:4px 6px;justify-content:center;font-size:32px;line-height:1.15;margin:8px 0}
+.grp.sm{font-size:22px}
+.dot{width:26px;height:26px;border:3px solid var(--ink);border-radius:50%;display:inline-block}
+.pair{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.box{border:2px dashed var(--line);border-radius:14px;padding:6px 10px;min-width:130px}
+.box b{display:block;font-size:20px;color:var(--muted)}
+.row10{display:flex;justify-content:center;flex-wrap:wrap;gap:4px;margin:12px 0}
+.row10 span{width:42px;height:46px;border:2px solid var(--line);border-radius:8px;display:grid;place-items:center;font-family:var(--f-num);font-weight:700;font-size:22px}
+.row10 .blank{min-width:0;border:2px solid var(--accent);background:var(--okbg)}
+.table{display:inline-flex;gap:8px;flex-wrap:wrap;justify-content:center;font-size:38px;padding:10px 18px 4px;border-bottom:10px solid var(--wood);border-radius:6px;margin:8px 0;min-width:200px;min-height:70px}
+.fig{width:100%;max-width:440px;height:auto;display:block;margin:6px auto}
+.fig .lbl{fill:var(--ink);font:700 18px var(--f-body)}
+.pc{stroke:var(--ink);stroke-width:1.5}
+.pc0{fill:var(--zh)} .pc1{fill:var(--ma)} .pc2{fill:var(--ok)}
+.tip{fill:var(--wood);stroke:var(--ink);stroke-width:1.5} .lead{fill:var(--ink)}
+.crown{fill:var(--ok);stroke:var(--ink);stroke-width:1.5} .trunk{fill:var(--wood);stroke:var(--ink);stroke-width:1.5}
+.ground{stroke:var(--muted);stroke-width:3}
+.cush{fill:var(--accent);stroke:var(--ink);stroke-width:1.5}
+.ln{fill:none;stroke:var(--zh);stroke-width:6;stroke-linecap:round}
+.rt{fill:none;stroke:var(--muted);stroke-width:5;stroke-linecap:round}
+.house{fill:var(--ma);stroke:var(--ink);stroke-width:1.5}
+.kid{fill:var(--zh);stroke:var(--ink);stroke-width:1.5}
+.step{fill:var(--wood);stroke:var(--ink);stroke-width:1.5}
+.choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-top:14px}
+.choice{background:var(--card);border:3px solid var(--line);border-radius:16px;padding:12px 8px;font-size:24px;min-height:64px;display:flex;align-items:center;justify-content:center;transition:transform .1s}
+.choice:active{transform:scale(.97)}
+.choice .num{font-size:32px}
+.choice.ok{border-color:var(--ok);background:var(--okbg)}
+.choice.bad{border-color:var(--bad);background:var(--badbg)}
+.choice.dim{opacity:.45}
+.fb{margin-top:14px;border-radius:16px;padding:14px 16px;text-align:left;display:flex;flex-direction:column;gap:8px}
+.fb.ok{background:var(--okbg)} .fb.bad{background:var(--badbg)}
+.fb strong{font-size:20px}
+.fb.ok strong{color:var(--ok)} .fb.bad strong{color:var(--bad)}
+.btn{background:var(--ink);color:var(--bg);border:none;border-radius:14px;padding:12px 20px;font-size:18px;font-weight:700;align-self:stretch}
+.btn.alt{background:var(--card);color:var(--ink);border:2px solid var(--line)}
+.res{text-align:center}
+.res .bigstars{font-size:56px;letter-spacing:6px;margin:10px 0}
+.res .bigstars span{display:inline-block;animation:pop .4s backwards}
+.res .bigstars .off{filter:grayscale(1);opacity:.3}
+@keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
+.res .score{font-family:var(--f-num);font-size:44px;font-weight:700}
+.btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.btns .btn{flex:1;min-width:140px}
+.wl{margin-top:20px;text-align:left;display:flex;flex-direction:column;gap:10px}
+.wi{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:10px 14px;font-size:15px}
+.wi .q{max-height:200px;overflow:hidden}
+.wi .q .pic{font-size:40px}.wi .q .eq{font-size:26px}.wi .q .sent{font-size:18px}.wi .q .grp{font-size:20px}.wi .q .fig{max-width:260px}
+.wi .a{color:var(--ok);font-weight:700;margin-top:4px}
+.note{color:var(--muted);font-size:13px;margin-top:24px;line-height:1.7}
+.pads{display:flex;flex-direction:column;align-items:center;gap:10px;margin:14px 0 8px}
+.pad{display:block;max-width:100%;height:auto;touch-action:none;background:var(--card);border-radius:10px;cursor:crosshair}
+.pads.lock .pad{cursor:default}
+.tools{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+.tool{border:2px solid var(--line);background:var(--card);border-radius:99px;padding:6px 16px;font-size:15px}
+.acts{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+.say{font-size:22px;border:3px solid var(--zh);color:var(--zh);background:var(--card);border-radius:16px;padding:10px 22px;font-weight:700;margin:4px 0}
+.parent{font-size:13px;color:var(--muted);margin-top:8px}
+.parent summary{cursor:pointer}
+.fb.neu{background:var(--bg)}
+.fb .row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.fb .row .vs{font-size:24px}
+.two{display:flex;gap:10px}.two .btn{flex:1}
+.fix{background:none;border:none;color:var(--muted);text-decoration:underline;font-size:14px;align-self:flex-start;padding:0}
+.wait{color:var(--muted);font-weight:700}
+.vt{display:inline-grid;justify-items:end;font-family:var(--f-num);font-weight:700;font-size:36px;font-variant-numeric:tabular-nums;border-bottom:3px solid var(--ink);padding:0 10px;line-height:1.3;margin:6px 0}
+.rul{fill:var(--card);stroke:var(--ink);stroke-width:1.5}.tk{stroke:var(--ink);stroke-width:1}
+.line{display:flex;justify-content:center;align-items:center;gap:4px;font-size:32px;margin:8px 0}
+.line small{font-size:14px;color:var(--muted);font-weight:700}
+.rd{display:flex;flex-direction:row-reverse;justify-content:center;align-items:flex-start;gap:18px;flex-wrap:wrap}
+.rq{color:var(--zh);padding-right:14px;border-right:3px dotted var(--line)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div id="app"></div>
+
+<script>
+const app=document.getElementById('app');
+const R=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const hid=s=>{let h=0;for(const c of s)h=(h*31+c.codePointAt(0))|0;return 'q'+(h>>>0).toString(36)};
+const TK=/˙?[ㄅ-ㄩ]+[ˊˇˋ]?|＿＿|[「」『』。，？！、]/g, PV={'「':'﹁','」':'﹂'};
+function syl(s){const nt=s[0]==='˙';if(nt)s=s.slice(1);let t='';if('ˊˇˋ'.includes(s.slice(-1))){t=s.slice(-1);s=s.slice(0,-1)}const ch=[...s];
+ return `<span class="sy">${nt?'<i class="nt">˙</i>':''}${ch.map((c,i)=>`<b>${c}${i===ch.length-1&&t?`<i class="tn">${t}</i>`:''}</b>`).join('')}</span>`}
+const sylInner=s=>(s.match(TK)||[]).map(syl).join('');
+function vs(str,maxH=13){const toks=str.match(TK)||[];let tot=0;const h=toks.map(t=>{
+ if(t==='＿＿'){tot+=2.95;return '<span class="vb blank"></span>'}
+ if(/^[「」『』。，？！、]$/.test(t)){tot+=1.45;return `<span class="pu">${PV[t]||t}</span>`}
+ const n=[...t.replace(/[˙ˊˇˋ]/g,'')].length;tot+=n*1.1+(t[0]==='˙'?.5:0)+.35;return syl(t)}).join('');
+ return `<span class="vs" style="height:${Math.min(tot,maxH).toFixed(2)}em">${h}</span>`}
+const bp=s=>vs(s);
+const num=n=>`<span class="num">${n}</span>`;
+const LBL=['ㄅ','ㄆ','ㄇ'];
+function mk(prompt,say,answer,wrongs,extra={}){return Object.assign({id:hid(prompt+answer),prompt,say,answer,choices:shuffle([answer,...wrongs])},extra)}
+function speak(t){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='zh-TW';u.rate=.9;speechSynthesis.speak(u)}catch(e){}}
+
+/* ---------- 共用 ---------- */
+const CN=['零','一','二','三','四','五','六','七','八','九','十'];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const W=(p,say,ans,mode,extra={})=>Object.assign({type:'write',id:hid(p+ans+(extra.word||'')),prompt:p,say,ans,mode,answer:mode==='zh'?vs(ans):num(ans)},extra);
+const wDict=([word,a,say])=>W(`<p class="ask">聽寫</p>`,say,a,'zh',{sub:'zh',dict:true,word,explain:''});
+const take=(g,n)=>{let o=[];while(o.length<n)o=o.concat(shuffle(g));return o.slice(0,n)};
+const uniq=(g,n)=>{const o=[],ids=new Set();let k=0;while(o.length<n&&k++<n*10){const q=pick(g)();if(!ids.has(q.id)){ids.add(q.id);o.push(q)}}return o};
+const mixG=(a,na,b,nb)=>shuffle([...uniq(a,na),...uniq(b,nb)]);
+const GL=['甲','乙','丙'];
+const MC=(p,say,a,w,ex)=>mk(p,say,a,w,{sub:'ma',explain:ex});
+function wn(n,k=3){const s=String(n),c=new Set(),add=v=>{if(v>=0&&v!==n&&Number.isInteger(v))c.add(v)};
+ for(let t=0;t<8&&s.length>1;t++){const a=[...s],i=R(0,s.length-1),j=R(0,s.length-1);if(i!==j&&a[i]!==a[j]){[a[i],a[j]]=[a[j],a[i]];if(a[0]!=='0')add(+a.join(''))}}
+ [1,10,100,1000].forEach(d=>{if(d<=Math.max(10,n)){add(n+d);if(n-d>=0)add(n-d)}});
+ return shuffle([...c]).slice(0,k).map(num)}
+const NQ=(wr,p,say,ans,ex)=>wr?W(p,say,String(ans),'num',{sub:'ma',explain:ex}):MC(p,say,num(ans),wn(ans),ex);
+function cnum(n){if(n===0)return '零';const d='零一二三四五六七八九',u=['千','百','十',''],s=String(n).padStart(4,'0');let o='',z=false,st=false;
+ for(let i=0;i<4;i++){const c=+s[i];if(!c){if(st)z=true;continue}if(z){o+='零';z=false}o+=d[c]+u[i];st=true}return o.startsWith('一十')?o.slice(1):o}
+function N4(){const d=[R(1,9),pick([0,R(0,9),R(1,9)]),pick([0,R(0,9),R(1,9)]),pick([0,R(0,9),R(1,9)])];return +d.join('')}
+const PLN=['千','百','十','個'];
+const vert=(a,op,b)=>`<div class="vt"><span>${a}</span><span>${op} ${b}</span></div>`;
+const r100=n=>Math.round(n/100)*100,r1000=n=>Math.round(n/1000)*1000;
+
+/* ---------- 一、10000 以內的數 ---------- */
+const u1_read=wr=>()=>{const n=N4();return NQ(wr,`<p class="ask">「${cnum(n)}」寫成數字是多少？</p>`,`${cnum(n)}寫成數字是多少？`,n,`${cnum(n)} 寫成 ${n}，沒有的位要補 0。`)};
+const u1_say=()=>{const n=N4(),ws=new Set();[...wn(n,6)].forEach(()=>{});let k=0;while(ws.size<3&&k++<40){const v=+String(n).split('').map((c,i,a)=>i===R(0,3)?String(R(0,9)):c).join('');if(v!==n&&v>=1000)ws.add(cnum(v))}
+ return MC(`<p class="ask"><span class="num big">${n}</span> 怎麼讀？</p>`,'',cnum(n),[...ws],`${n} 讀作「${cnum(n)}」。`)};
+const u1_place=()=>{const n=N4(),i=R(0,3),dg=String(n)[i];return MC(`<p class="ask"><span class="num big">${n}</span> 的${PLN[i]}位數字是多少？</p>`,'',num(dg),shuffle([...new Set([...String(n),'0','1','5','9'])].filter(c=>c!==dg)).slice(0,3).map(num),`${n}：千位 ${String(n)[0]}、百位 ${String(n)[1]}、十位 ${String(n)[2]}、個位 ${String(n)[3]}。`)};
+const u1_value=wr=>()=>{let n,i;do{n=N4();i=R(0,2)}while(String(n)[i]==='0');const v=+String(n)[i]*[1000,100,10][i];return NQ(wr,`<p class="ask"><span class="num big">${n}</span> 裡，${PLN[i]}位的數字代表多少？</p>`,'',v,`${PLN[i]}位的 ${String(n)[i]} 代表 ${String(n)[i]} 個${['千','百','十'][i]}，就是 ${v}。`)};
+const u1_compose=wr=>()=>{const n=N4(),d=String(n).split('');return NQ(wr,`<p class="ask">${d[0]} 個千、${d[1]} 個百、${d[2]} 個十和 ${d[3]} 個一，合起來是多少？</p>`,'',n,`照千、百、十、個的位置寫：${n}。`)};
+const u1_money=wr=>()=>{const a=R(1,9),b=R(0,9),c=R(0,9),d=R(0,9),n=a*1000+b*100+c*10+d;return NQ(wr,`<p class="ask">${a} 張千元鈔、${b} 張百元鈔、${c} 個十元和 ${d} 個一元，一共是多少元？</p><div class="pic" style="font-size:40px">💵🪙</div>`,'',n,`${a} 千 ${b} 百 ${c} 十 ${d} 個，共 ${n} 元。`)};
+const u1_cmp=()=>{const a=N4();let b;do{const s=String(a).split('');const i=R(1,3);s[i]=String(R(0,9));b=+s.join('')}while(b===a&&Math.random()<.85);const ans=a>b?'＞':a<b?'＜':'＝';
+ return MC(`<p class="ask">○ 裡要填哪一個符號？</p><div class="eq"><span class="num">${a}</span><i>○</i><span class="num">${b}</span></div>`,'',`<span style="font-size:36px">${ans}</span>`,['＞','＜','＝'].filter(x=>x!==ans).map(x=>`<span style="font-size:36px">${x}</span>`),'從最高位開始比，千位一樣就比百位，再比十位、個位。')};
+const u1_conv=wr=>()=>{if(Math.random()<.5){const k=R(11,99);return NQ(wr,`<p class="ask">${k} 個百是多少？</p>`,'',k*100,`${k} 個百 = ${k*100}。`)}const m=R(11,99)*10;return NQ(wr,`<p class="ask">${m} 是幾個十？</p>`,'',m/10,`${m} = ${m/10} 個十。`)};
+const u1_next=wr=>()=>{const n=pick([R(1000,9989),pick([1999,2999,4099,5990,6909,8999])]),[t,d]=pick([['多 1',1],['少 1',-1],['多 10',10],['多 100',100],['少 100',-100],['多 1000',1000]]);const a=n+d;if(a<0||a>9999)return u1_next(wr)();
+ return NQ(wr,`<p class="ask">比 <span class="num big">${n}</span> ${t.replace(/\d+/,m=>`<span class="num">${m}</span>`)} 的數是多少？</p>`,'',a,`${n} ${d>0?'+':'−'} ${Math.abs(d)} = ${a}。`)};
+const u1_line=wr=>()=>{const step=pick([10,100]),s=step===10?R(10,98)*100:R(1,8)*1000,k=R(1,9),ans=s+k*step;let g='<svg class="fig" viewBox="0 0 330 90">';
+ g+='<line x1="15" y1="50" x2="315" y2="50" class="ground"/>';for(let i=0;i<=10;i++){const x=15+i*30;g+=`<line x1="${x}" y1="${i%5?44:40}" x2="${x}" y2="${i%5?56:60}" class="ground"/>`}
+ g+=`<text x="15" y="80" text-anchor="middle" class="lbl" style="font-size:13px">${s}</text><text x="315" y="80" text-anchor="middle" class="lbl" style="font-size:13px">${s+10*step}</text>`;
+ const ax=15+k*30;g+=`<polygon points="${ax},38 ${ax-8},22 ${ax+8},22" class="house"/></svg>`;
+ return NQ(wr,`<p class="ask">數線上每一小格都一樣大，箭頭指的數是多少？</p>${g}`,'',ans,`10 格從 ${s} 到 ${s+10*step}，每格 ${step}。往右數 ${k} 格：${s} + ${k*step} = ${ans}。`)};
+const U1=[u1_read(0),u1_say,u1_place,u1_value(0),u1_compose(0),u1_money(0),u1_cmp,u1_conv(0),u1_next(0),u1_line(0)],WU1=[u1_read(1),u1_value(1),u1_compose(1),u1_money(1),u1_conv(1),u1_next(1),u1_line(1)];
+
+/* ---------- 二、四位數的加減 ---------- */
+const u2_add=wr=>()=>{const a=R(100,6999),b=R(100,9999-a);return NQ(wr,`<p class="ask">用直式算算看</p>${vert(a,'＋',b)}`,'',a+b,`${a} + ${b} = ${a+b}，個位對齊，滿 10 要進位。`)};
+const u2_sub=wr=>()=>{const a=pick([R(1000,9999),R(1,9)*1000+pick([0,3,5,R(0,9)])]),b=R(100,a-1);return NQ(wr,`<p class="ask">用直式算算看</p>${vert(a,'－',b)}`,'',a-b,`${a} − ${b} = ${a-b}，不夠減要向前一位借 1。`)};
+const ST2=[(a,b)=>[`學校原有 ${a} 本故事書，又買了 ${b} 本，現在共有幾本？`,a+b,'本'],(a,b)=>[`小明存了 ${a+b} 元，買腳踏車花了 ${a} 元，還剩幾元？`,b,'元'],(a,b)=>[`動物園上午有 ${a} 人入園，下午有 ${b} 人，這天一共幾人？`,a+b,'人'],(a,b)=>[`一臺冰箱 ${a+b} 元，一臺電扇 ${b} 元，冰箱比電扇貴幾元？`,a,'元'],(a,b)=>[`果園採了 ${a+b} 顆柳丁，賣掉 ${b} 顆，還剩幾顆？`,a,'顆']];
+const u2_story=wr=>()=>{const a=R(300,4999),b=R(150,4999),[q,ans,u]=pick(ST2)(a,b);return NQ(wr,`<p class="ask">${q}</p>`,q,ans,`答：${ans} ${u}。先想清楚是「合起來」用加法，還是「拿走、比差多少」用減法。`)};
+const u2_est=()=>{const a=R(1100,4900),b=R(1100,4900),k=Math.random()<.6,add=Math.random()<.6,[x,y]=add?[a,b]:[Math.max(a,b),Math.min(a,b)],r=k?r100:r1000,ans=add?r(x)+r(y):r(x)-r(y),u=k?100:1000;
+ const ws=[...new Set([ans+u,ans-u,add?x+y:x-y].filter(v=>v!==ans&&v>=0))].slice(0,3);
+ return MC(`<p class="ask">用「整${k?'百':'千'}」估算，<span class="num">${x} ${add?'＋':'－'} ${y}</span> 大約是多少？</p>`,'',num(ans),ws.map(num),`${x} 約 ${r(x)}，${y} 約 ${r(y)}，${r(x)} ${add?'+':'−'} ${r(y)} = ${ans}。`)};
+const U2=[u2_add(0),u2_sub(0),u2_story(0),u2_est],WU2=[u2_add(1),u2_sub(1),u2_story(1)];
+
+/* ---------- 三、毫米 ---------- */
+const u3_c1=wr=>()=>{const c=R(2,15);return NQ(wr,`<p class="ask">${c} 公分 = ？ 毫米</p>`,'',c*10,`1 公分 = 10 毫米，${c} 公分 = ${c*10} 毫米。`)};
+const u3_c2=wr=>()=>{const c=R(1,15),m=R(1,9);return NQ(wr,`<p class="ask">${c} 公分 ${m} 毫米 = ？ 毫米</p>`,'',c*10+m,`${c} 公分 = ${c*10} 毫米，再加 ${m} 毫米 = ${c*10+m} 毫米。`)};
+const cm=(mm)=>`${Math.floor(mm/10)} 公分 ${mm%10} 毫米`;
+const u3_c3=()=>{let x;do{x=R(12,159)}while(x%10===0);const ws=new Set([`${x%10} 公分 ${Math.floor(x/10)} 毫米`,cm(x+10),cm(x+1),`${x} 公分`]);ws.delete(cm(x));
+ return MC(`<p class="ask">${x} 毫米 = ？</p>`,'',cm(x),[...ws].slice(0,3),`每 10 毫米是 1 公分，${x} 毫米 = ${cm(x)}。`)};
+function ruler(s,L){let g='<svg class="fig" viewBox="0 0 330 96"><rect x="5" y="30" width="320" height="60" rx="4" class="rul"/>';for(let i=0;i<=100;i++){const x=15+i*3,h=i%10?(i%5?8:13):20;g+=`<line x1="${x}" y1="30" x2="${x}" y2="${30+h}" class="tk"/>`;if(i%10===0)g+=`<text x="${x}" y="72" text-anchor="middle" class="lbl" style="font-size:12px">${i/10}</text>`}
+ g+=`<text x="300" y="86" class="lbl" style="font-size:10px">公分</text><rect x="${15+s*3}" y="12" width="${L*3}" height="12" rx="2" class="pc pc1"/></svg>`;return g}
+const u3_ruler=wr=>()=>{const s=pick([0,0,R(5,30)]),L=R(12,99-s);if(L%10===0)return u3_ruler(wr)();return NQ(wr,`<p class="ask">這條色帶長幾毫米？</p>${ruler(s,L)}`,'',L,s?`從 ${cm(s)} 量到 ${cm(s+L)}，相減是 ${L} 毫米（${cm(L)}）。`:`從 0 開始，長 ${cm(L)}，就是 ${L} 毫米。`)};
+const u3_cmp=()=>{const a=R(21,99),b=a+pick([-3,-2,-1,1,2,3]);const A=cm(a),B=`${b} 毫米`,ans=a>b?A:B;return MC(`<p class="ask">哪一個比較長？</p>`,'',ans,[ans===A?B:A],`${A} = ${a} 毫米，和 ${b} 毫米比，${a>b?A:B}比較長。`)};
+const UNIT3=[['一枝新鉛筆長約 18','公分'],['一隻螞蟻長約 5','毫米'],['一元硬幣厚約 2','毫米'],['國語課本長約 26','公分'],['教室長約 9','公尺'],['小指甲寬約 9','毫米'],['一張紙厚約 1','毫米'],['一層樓高約 3','公尺']];
+const u3_unit=()=>{const [q,u]=pick(UNIT3);return MC(`<p class="ask">${q}（　），括號裡填哪個單位？</p>`,'',u,['公分','毫米','公尺'].filter(x=>x!==u),`想想實際大小：${q} ${u}。`)};
+const u3_calc=wr=>()=>{const a=R(2,9),b=R(1,9),c=R(1,6),d=R(1,9),add=Math.random()<.6,t1=a*10+b,t2=c*10+d;if(!add&&t1<=t2)return u3_calc(wr)();const ans=add?t1+t2:t1-t2;
+ return NQ(wr,`<p class="ask">${a} 公分 ${b} 毫米 ${add?'＋':'－'} ${c} 公分 ${d} 毫米 = ？ 毫米</p>`,'',ans,`先換成毫米：${t1} ${add?'+':'−'} ${t2} = ${ans} 毫米。`)};
+const U3=[u3_c1(0),u3_c2(0),u3_c3,u3_ruler(0),u3_cmp,u3_unit,u3_calc(0)],WU3=[u3_c1(1),u3_c2(1),u3_ruler(1),u3_calc(1)];
+
+/* ---------- 四、乘法 ---------- */
+const u4_mul=wr=>()=>{const a=pick([R(12,99),R(101,999)]),b=R(2,9);return NQ(wr,`<p class="ask">用直式算算看</p>${vert(a,'×',b)}`,'',a*b,`${a} × ${b} = ${a*b}，從個位乘起，滿 10 要進位。`)};
+const ST4=[(a,b)=>[`每箱有 ${a} 瓶水，${b} 箱共有幾瓶？`,'瓶'],(a,b)=>[`一張電影票 ${a} 元，買 ${b} 張要多少元？`,'元'],(a,b)=>[`每排坐 ${a} 人，${b} 排共坐幾人？`,'人'],(a,b)=>[`一本故事書 ${a} 頁，${b} 本共有幾頁？`,'頁']];
+const u4_story=wr=>()=>{const a=pick([R(12,99),R(105,450)]),b=R(2,9),[q,u]=pick(ST4)(a,b);return NQ(wr,`<p class="ask">${q}</p>`,q,a*b,`${a} × ${b} = ${a*b}，答：${a*b} ${u}。`)};
+const u4_chain=wr=>()=>{const a=R(2,9),b=R(2,9),c=R(2,5);return NQ(wr,`<p class="ask">每盒有 ${a} 顆巧克力，每袋裝 ${b} 盒，${c} 袋共有幾顆巧克力？</p>`,'',a*b*c,`先算 1 袋：${a} × ${b} = ${a*b} 顆，再算 ${c} 袋：${a*b} × ${c} = ${a*b*c} 顆。`)};
+const u4_est=()=>{let a;do{a=R(105,895)}while(a%100<10||a%100>90);const b=R(2,9),ans=r100(a)*b;return MC(`<p class="ask">把 ${a} 估成整百，<span class="num">${a} × ${b}</span> 大約是多少？</p>`,'',num(ans),[...new Set([ans+100*b,ans-100*b,a*b,ans+100].filter(v=>v!==ans&&v>0))].slice(0,3).map(num),`${a} 約 ${r100(a)}，${r100(a)} × ${b} = ${ans}。`)};
+const U4=[u4_mul(0),u4_story(0),u4_chain(0),u4_est],WU4=[u4_mul(1),u4_story(1),u4_chain(1)];
+
+/* ---------- 五、角 ---------- */
+function angSvg(list){let x=12,body='';
+ list.forEach(([th,L1,L2,lab])=>{const r=th*Math.PI/180,left=Math.max(0,-L2*Math.cos(r)),cx=x+left,cy=120,x2=cx+L2*Math.cos(r),y2=cy-L2*Math.sin(r);
+  body+=`<line x1="${cx}" y1="${cy}" x2="${cx+L1}" y2="${cy}" style="stroke:var(--ink);stroke-width:3;stroke-linecap:round"/><line x1="${cx}" y1="${cy}" x2="${x2}" y2="${y2}" style="stroke:var(--ink);stroke-width:3;stroke-linecap:round"/>`;
+  body+=th===90?`<polyline points="${cx+14},${cy} ${cx+14},${cy-14} ${cx},${cy-14}" fill="none" style="stroke:var(--bad);stroke-width:2"/>`:`<path d="M${cx+18} ${cy} A18 18 0 0 0 ${cx+18*Math.cos(r)} ${cy-18*Math.sin(r)}" fill="none" style="stroke:var(--bad);stroke-width:2"/>`;
+  if(lab)body+=`<text x="${cx}" y="146" text-anchor="middle" class="lbl" style="font-size:16px">${lab}</text>`;
+  x=cx+Math.max(L1,L2*Math.cos(r))+34});
+ return `<svg class="fig" viewBox="0 0 ${x} 152" style="max-width:${Math.min(440,x*1.4)}px">${body}</svg>`}
+const AT=th=>th<90?'銳角':th===90?'直角':'鈍角';
+const u5_type=()=>{const th=pick([30,40,55,70,90,90,110,125,140,155]);return MC(`<p class="ask">這是什麼角？</p>${angSvg([[th,R(80,110),R(70,110)]])}`,'',AT(th),['銳角','直角','鈍角'].filter(x=>x!==AT(th)),'比直角小的是銳角，比直角大的是鈍角。可以用三角板的直角去比比看。')};
+const u5_cmp=()=>{let a=R(30,150),b;do{b=R(30,150)}while(Math.abs(a-b)<20);const big=Math.random()<.5,ans=(big?a>b:a<b)?0:1,La=a>b?60:110,Lb=a>b?110:60;
+ return MC(`<p class="ask">哪一個角比較${big?'大':'小'}？</p>${angSvg([[a,La,La,'甲'],[b,Lb,Lb,'乙']])}`,'',GL[ans],[GL[1-ans]],'角的大小要看兩條邊張開的程度，和邊畫得長或短沒有關係。')};
+const CL=[[3,90],[9,90],[1,30],[2,60],[4,120],[5,150],[10,60],[8,120]];
+const u5_clock=()=>{const [h,d]=pick(CL);const t=d<90?'銳角':d===90?'直角':'鈍角';let g='<svg class="fig" viewBox="0 0 140 140" style="max-width:170px"><circle cx="70" cy="70" r="60" class="rul"/>';for(let i=0;i<12;i++){const r=i*Math.PI/6;g+=`<line x1="${70+52*Math.sin(r)}" y1="${70-52*Math.cos(r)}" x2="${70+58*Math.sin(r)}" y2="${70-58*Math.cos(r)}" class="tk"/>`}
+ const hr=h*Math.PI/6;g+=`<line x1="70" y1="70" x2="70" y2="20" style="stroke:var(--ink);stroke-width:3;stroke-linecap:round"/><line x1="70" y1="70" x2="${70+35*Math.sin(hr)}" y2="${70-35*Math.cos(hr)}" style="stroke:var(--bad);stroke-width:5;stroke-linecap:round"/><circle cx="70" cy="70" r="4" class="lead"/></svg>`;
+ return MC(`<p class="ask">${h} 點整時，長針和短針形成什麼角？</p>${g}`,'',t,['銳角','直角','鈍角'].filter(x=>x!==t),`${h} 點整時兩針張開的角是${t}。3 點、9 點整剛好是直角。`)};
+const CON=[['角的兩條邊交會的那一點叫做什麼？','頂點',['邊','直角','角度']],['一個角是由幾條邊組成的？','2 條',['1 條','3 條','4 條']],['長方形有幾個直角？','4 個',['2 個','3 個','0 個']],['正方形的四條邊有什麼特性？','一樣長',['兩兩不一樣長','只有兩條一樣長','都不一樣長']],['一個三角形最多可以有幾個直角？','1 個',['2 個','3 個','0 個']],['把角的兩條邊畫長一點，角會變怎樣？','大小不變',['變大','變小','變成直角']],['長方形和正方形都有幾個角？','4 個',['3 個','5 個','2 個']],['比直角小的角叫做什麼？','銳角',['鈍角','平角','直角']]];
+const u5_con=()=>{const [q,a,w]=pick(CON);return MC(`<p class="ask">${q}</p>`,'',a,w,`答案是「${a}」。`)};
+const u5_count=wr=>()=>{const sh=pick([['長方形',4,'<rect x="40" y="30" width="160" height="90" class="pc pc0"/>'],['正方形',4,'<rect x="60" y="20" width="110" height="110" class="pc pc2"/>'],['直角三角形',1,'<polygon points="50,130 50,30 200,130" class="pc pc1"/>'],['三角形',0,'<polygon points="120,20 40,130 200,130" class="pc pc1"/>']]);
+ return NQ(wr,`<p class="ask">這個${sh[0]}有幾個直角？</p><svg class="fig" viewBox="0 0 240 150" style="max-width:260px">${sh[2]}</svg>`,'',sh[1],`用三角板的直角去比，${sh[0]}有 ${sh[1]} 個直角。`)};
+const U5=[u5_type,u5_cmp,u5_clock,u5_con,u5_count(0)],WU5=[u5_count(1)];
+
+const UNITS=[
+ {id:'u1',sec:'ma',sub:'ma',t:'一、10000 以內的數',d:'讀寫數・位值・錢幣・比大小・數線',make:()=>mixG(U1,7,WU1,3)},
+ {id:'u2',sec:'ma',sub:'ma',t:'二、四位數的加減',d:'直式加減・應用題・估算',make:()=>mixG(U2,6,WU2,4)},
+ {id:'u3',sec:'ma',sub:'ma',t:'三、毫米',d:'公分毫米換算・量長度・長度計算',make:()=>mixG(U3,7,WU3,3)},
+ {id:'u4',sec:'ma',sub:'ma',t:'四、乘法',d:'直式乘法・應用題・連乘・估算',make:()=>mixG(U4,6,WU4,4)},
+ {id:'u5',sec:'ma',sub:'ma',t:'五、角',d:'銳角直角鈍角・比大小・時鐘・正方形長方形',make:()=>mixG(U5,8,WU5,2)},
+ {id:'em',sec:'ex',sub:'ma',t:'數學期中模擬考',d:'20 題・第 1–5 單元',make:()=>mixG([...U1,...U2,...U3,...U4,...U5],13,[...WU1,...WU2,...WU3,...WU4,...WU5],7)}
+];
+
+/* ---------- 手寫板 ---------- */
+const cssv=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim()||'#888';
+function makePad(w,h,kind){
+ const c=document.createElement('canvas');c.className='pad';c.style.width=w+'px';c.style.aspectRatio=w+'/'+h;
+ const dpr=Math.min(3,window.devicePixelRatio||1);c.width=w*dpr;c.height=h*dpr;
+ const ctx=c.getContext('2d');ctx.scale(dpr,dpr);
+ const P={c,ctx,w,h,kind,strokes:[],cur:null,lock:false};
+ const pos=e=>{const r=c.getBoundingClientRect();return [(e.clientX-r.left)*w/r.width,(e.clientY-r.top)*h/r.height]};
+ c.addEventListener('pointerdown',e=>{if(P.lock)return;e.preventDefault();try{c.setPointerCapture(e.pointerId)}catch(_){}P.cur=[pos(e)];P.strokes.push(P.cur);drawPad(P)});
+ c.addEventListener('pointermove',e=>{if(!P.cur)return;e.preventDefault();P.cur.push(pos(e));drawPad(P)});
+ const end=()=>{P.cur=null};c.addEventListener('pointerup',end);c.addEventListener('pointercancel',end);c.addEventListener('pointerleave',end);
+ drawPad(P);return P;
+}
+function guides(ctx,w,h,kind,col,lw){
+ ctx.save();ctx.strokeStyle=col;ctx.lineWidth=lw;ctx.setLineDash([]);ctx.strokeRect(lw/2,lw/2,w-lw,h-lw);ctx.setLineDash([6,6]);ctx.beginPath();
+ if(kind==='zh'){const tx=w*.74;ctx.moveTo(tx,0);ctx.lineTo(tx,h);for(const f of [1/3,2/3]){ctx.moveTo(0,h*f);ctx.lineTo(tx,h*f)}}
+ else{ctx.moveTo(w/2,0);ctx.lineTo(w/2,h);ctx.moveTo(0,h/2);ctx.lineTo(w,h/2)}
+ ctx.stroke();ctx.restore();
+}
+function strokes(ctx,P,col,s=1,ox=0,oy=0){
+ ctx.save();ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineCap='round';ctx.lineJoin='round';ctx.lineWidth=(P.kind==='zh'?5:8)*s;
+ for(const st of P.strokes){if(st.length===1){ctx.beginPath();ctx.arc(ox+st[0][0]*s,oy+st[0][1]*s,ctx.lineWidth/2,0,7);ctx.fill();continue}
+  ctx.beginPath();ctx.moveTo(ox+st[0][0]*s,oy+st[0][1]*s);for(let i=1;i<st.length;i++)ctx.lineTo(ox+st[i][0]*s,oy+st[i][1]*s);ctx.stroke()}
+ ctx.restore();
+}
+function drawPad(P){const {ctx,w,h}=P;ctx.clearRect(0,0,w,h);guides(ctx,w,h,P.kind,cssv('--line'),2);strokes(ctx,P,cssv('--ink'))}
+function composite(pads){
+ const s=2,gap=16,W_=Math.max(...pads.map(p=>p.w))*s+gap*2,H_=pads.reduce((a,p)=>a+p.h*s+gap,gap);
+ const c=document.createElement('canvas');c.width=W_;c.height=H_;const ctx=c.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,W_,H_);
+ let y=gap;for(const p of pads){ctx.save();ctx.translate(gap,y);guides(ctx,p.w*s,p.h*s,p.kind,'#c8c8c8',2);ctx.restore();strokes(ctx,p,'#000',s,gap,y);y+=p.h*s+gap}
+ return new Promise(r=>c.toBlob(r,'image/png'));
+}
+
+/* ---------- 老師批改（Claude） ---------- */
+let SAMPLE=null,AI_OK=false;
+try{if(window.claude&&claude.use)claude.use('sample').then(s=>{if(!s)return;SAMPLE=s;s.limits().then(l=>{AI_OK=!!(l&&l.images);if(S&&!S.done&&S.qs[S.i].type==='write')quiz(true)}).catch(()=>{})}).catch(()=>{})}catch(e){}
+const DEAD=['not_granted','sampling_disabled','images_unavailable','not_declared','capability_disabled','capability_removed','session_expired'];
+function gradePrompt(q){
+ if(q.mode==='zh'){const n=q.ans.split(' ').length;
+  return `你是台灣國小一年級的國語老師，正在批改學生手寫的注音（第一冊首冊程度）。
+圖片是學生寫的答案：共 ${n} 個大格子，由上到下各代表一個字。每格內注音符號由上往下直寫；格子右側窄欄是聲調欄（ˊˇˋ 寫在右側，一聲不標調），輕聲「˙」寫在該字最上方。
+正確答案：${q.ans}（字與字之間以空格分開）。
+請辨識學生寫的內容並判斷是否正確：筆畫歪斜、大小不一不扣分，但符號寫錯、少寫、多寫、順序錯、聲調錯或位置錯都算錯。看不出寫什麼也算錯。
+只回 JSON：{"correct":true或false,"read":"你辨識到的注音，字之間空格，看不懂的符號用？","tip":"給三年級孩子的一句話（25字內、繁體中文、溫和具體，錯的話說出哪裡要改）"}`}
+ return `你是台灣國小三年級的數學老師，正在批改學生手寫的阿拉伯數字（可能是多位數，由左到右）。圖片中格子裡是學生寫的答案。正確答案是 ${q.ans}。
+字醜不扣分，但寫成其他數字、反過來寫（如 3 寫成 Ɛ）或看不出來都算錯，反寫請在提醒中指出。
+只回 JSON：{"correct":true或false,"read":"你辨識到的數字","tip":"給三年級孩子的一句話（25字內、繁體中文）"}`;
+}
+
+/* ---------- 狀態與畫面 ---------- */
+let S=null;
+const book=()=>store.get('g3wrong',[]);
+const stars=n=>n>=9?3:n>=7?2:n>=5?1:0;
+const starStr=k=>[0,1,2].map(i=>i<k?'★':'<span class="off">★</span>').join('');
+
+function home(){
+ try{speechSynthesis.cancel()}catch(e){}
+ const best=store.get('g3best',{}),wb=book();
+ const card=u=>`<button class="unit ${u.sub}" data-u="${u.id}"><b>${u.t}</b><small>${u.d}</small><span class="stars">${starStr(best[u.id]||0)}</span></button>`;
+ const sec=(k,name,col)=>`<div class="sec"><i style="background:${col}"></i>${name}</div><div class="units">${UNITS.filter(u=>u.sec===k).map(card).join('')}</div>`;
+ app.innerHTML=`${document.fullscreenEnabled?'<button class="fs" id="fs">⛶ 全螢幕</button>':''}<h1>小三複習樂園</h1><p class="sub">三上期中考複習｜數學康軒第 1–5 單元・選擇＋手寫，題目每次都會換</p>
+ ${sec('ma','數學（康軒 3上）','var(--ma)')}${sec('ex','期中模擬考','var(--bad)')}
+ <div class="sec"><i style="background:var(--bad)"></i>錯題本</div><div class="units"><button class="unit rv" data-u="rv" ${wb.length?'':'disabled'}><b>錯題再練習</b><small>${wb.length?`還有 ${wb.length} 題要練，答對就會移出錯題本`:'目前沒有錯題，太棒了'}</small></button></div>
+ <p class="note">使用說明：<br>・手寫題直接用手指或觸控筆把答案寫在格子裡，多位數從左寫到右。<br>・在 claude.ai 開啟時，可以按「請老師批改」讓 Claude 判讀字跡；也可以按「自己對答案」。<br>・成績與錯題只存在這台裝置的瀏覽器。</p>`;
+ app.querySelectorAll('[data-u]').forEach(b=>b.onclick=()=>start(b.dataset.u));
+ const fs=document.getElementById('fs');if(fs)fs.onclick=()=>{try{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()}catch(e){}};
+}
+function start(id){
+ let qs,title;
+ if(id==='rv'){qs=shuffle(book()).slice(0,10).map(q=>q.choices?Object.assign({},q,{choices:shuffle(q.choices)}):Object.assign({},q));title='錯題再練習'}
+ else{const u=UNITS.find(x=>x.id===id);qs=u.make();title=u.t}
+ S={id,title,qs,i:0,score:0,done:false,wrong:[],pads:[],t0:Date.now()};quiz();
+}
+function quiz(keep){
+ const q=S.qs[S.i],n=S.qs.length;S.done=false;
+ const old=keep?S.pads:null;
+ const isW=q.type==='write';
+ app.innerHTML=`<div class="bar"><button class="x" id="back" aria-label="回首頁">✕</button><div class="prog"><span style="width:${S.i/n*100}%"></span></div><span class="cnt">${S.i+1}/${n}</span></div>
+ <div class="qcard"><span class="tag ${q.sub}">${q.sub==='zh'?'國語':'數學'}${isW?'・手寫':''}・${esc(S.title)}</span><br>
+ ${q.dict||q.read?'':('speechSynthesis' in window?'<button class="speak" id="spk">🔊 聽題目</button>':'')}
+ <div id="qp">${q.prompt}</div>
+ ${q.dict?`<button class="say" id="spk">🔊 再聽一次</button><details class="parent"><summary>家長唸題用</summary>請唸：「${esc(q.say)}」</details>`:''}
+ ${isW?`<div class="pads" id="pads"></div><div class="tools"><button class="tool" id="undo">↶ 擦掉上一筆</button><button class="tool" id="clr">🧽 全部擦掉</button></div>
+  <div class="acts" id="acts">${AI_OK?'<button class="btn" id="ai">✍️ 寫好了，請老師批改</button><button class="btn alt" id="self">自己對答案</button>':'<button class="btn" id="self">✍️ 寫好了，對答案</button>'}</div>`
+ :`<div class="choices">${q.choices.map((c,k)=>`<button class="choice" data-k="${k}">${c}</button>`).join('')}</div>`}
+ <div id="fb"></div></div>`;
+ document.getElementById('back').onclick=home;
+ const sp=document.getElementById('spk');if(sp)sp.onclick=()=>speak(q.say);
+ if(isW){
+  const box=document.getElementById('pads');
+  if(old&&old.length){S.pads=old;old.forEach(p=>{box.appendChild(p.c);drawPad(p)})}
+  else{S.pads=q.mode==='zh'?q.ans.split(' ').map(()=>makePad(124,196,'zh')):[makePad(Math.max(150,Math.min(360,60+q.ans.length*62)),150,'num')];S.pads.forEach(p=>box.appendChild(p.c))}
+  let last=null;S.pads.forEach(p=>p.c.addEventListener('pointerdown',()=>{last=p}));
+  document.getElementById('undo').onclick=()=>{const p=(last&&last.strokes.length?last:[...S.pads].reverse().find(x=>x.strokes.length));if(p&&!p.lock){p.strokes.pop();drawPad(p)}};
+  document.getElementById('clr').onclick=()=>S.pads.forEach(p=>{if(!p.lock){p.strokes=[];drawPad(p)}});
+  const ai=document.getElementById('ai');if(ai)ai.onclick=()=>aiGrade(q);
+  document.getElementById('self').onclick=()=>selfCheck(q);
+ }else app.querySelectorAll('.choice').forEach(b=>b.onclick=()=>answer(+b.dataset.k));
+ if(!keep){window.scrollTo(0,0);if(q.dict)setTimeout(()=>speak(q.say),350)}
+}
+const inked=()=>S.pads.some(p=>p.strokes.length);
+function lockPads(v){S.pads.forEach(p=>p.lock=v);const b=document.getElementById('pads');if(b)b.classList.toggle('lock',v);document.querySelectorAll('.tool').forEach(t=>t.disabled=v)}
+function needInk(){if(inked())return false;document.getElementById('fb').innerHTML='<div class="fb neu"><strong>還沒寫喔！</strong><span>先在格子裡寫出答案，再按按鈕。</span></div>';return true}
+async function aiGrade(q){
+ if(S.done||needInk())return;
+ lockPads(true);const acts=document.getElementById('acts');acts.hidden=true;
+ const fb=document.getElementById('fb');fb.innerHTML='<div class="fb neu"><span class="wait">老師批改中，請稍等一下…</span></div>';
+ try{
+  const blob=await composite(S.pads);
+  const r=await SAMPLE.json(gradePrompt(q),{images:[blob],cache:false});
+  if(!r||typeof r.correct!=='boolean')throw {code:'invalid_json'};
+  if(S.qs[S.i]!==q)return;
+  finish(q,r.correct,{ai:true,read:String(r.read||''),tip:String(r.tip||'')});
+ }catch(e){
+  if(S.qs[S.i]!==q)return;
+  if(DEAD.includes(e&&e.code))AI_OK=false;
+  fb.innerHTML='';selfCheck(q,'老師現在沒辦法批改，請和家長一起對答案。');
+ }
+}
+function selfCheck(q,msg){
+ if(S.done)return;if(!msg&&needInk())return;
+ lockPads(true);const acts=document.getElementById('acts');if(acts)acts.hidden=true;
+ const fb=document.getElementById('fb');
+ fb.innerHTML=`<div class="fb neu">${msg?`<span>${msg}</span>`:''}<div class="row"><strong>正確答案：</strong>${q.answer}</div><span>你寫的跟正確答案一樣嗎？${q.mode==='zh'?'（符號和聲調都要對）':''}</span>
+ <div class="two"><button class="btn" id="yes">✓ 寫對了</button><button class="btn alt" id="no">✕ 寫錯了</button></div></div>`;
+ document.getElementById('yes').onclick=()=>finish(q,true,{});
+ document.getElementById('no').onclick=()=>finish(q,false,{});
+ fb.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function apply(q,ok,sign){
+ let wb=book();
+ if(sign>0){if(ok){S.score++;wb=wb.filter(x=>x.id!==q.id)}else{S.wrong.push(q);if(!wb.some(x=>x.id===q.id))wb.unshift(q);wb=wb.slice(0,40)}}
+ else{if(ok)S.score--;else{S.wrong=S.wrong.filter(x=>x!==q);wb=wb.filter(x=>x.id!==q.id)}}
+ store.set('g3wrong',wb);
+}
+function finish(q,ok,info){
+ S.done=true;apply(q,ok,1);S.res={q,ok,info};renderFb();
+}
+function renderFb(){
+ const {q,ok,info}=S.res,last=S.i===S.qs.length-1,fb=document.getElementById('fb');
+ const read=info.read?`<div class="row">老師看到你寫：${q.mode==='zh'?vs(info.read):`<span class="num" style="font-size:24px">${esc(info.read)}</span>`}</div>`:'';
+ fb.innerHTML=`<div class="fb ${ok?'ok':'bad'}"><strong>${ok?pick(['答對了！','寫得很好！','完全正確！','你好厲害！']):'差一點點，再看一次正確寫法'}</strong>
+ ${q.type==='write'?`${read}<div class="row">正確答案：${q.answer}</div>${info.tip?`<span>${esc(info.tip)}</span>`:''}`:''}
+ <div>${q.explain||''}</div>
+ ${info.ai?`<button class="fix" id="fix">家長更正：改判為「${ok?'寫錯':'寫對'}」</button>`:''}
+ <button class="btn" id="nx">${last?'看成績':'下一題'}</button></div>`;
+ const fx=document.getElementById('fix');if(fx)fx.onclick=()=>{apply(q,ok,-1);apply(q,!ok,1);S.res.ok=!ok;renderFb()};
+ document.getElementById('nx').onclick=()=>{if(last)result();else{S.i++;quiz()}};
+ fb.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function answer(k){
+ if(S.done)return;
+ const q=S.qs[S.i],ok=q.choices[k]===q.answer;
+ app.querySelectorAll('.choice').forEach((b,j)=>{if(q.choices[j]===q.answer)b.classList.add('ok');else if(j===k)b.classList.add('bad');else b.classList.add('dim')});
+ if(q.fill){const bl=app.querySelector('#qp .blank');if(bl){bl.innerHTML=q.fill;bl.classList.add('filled');const p=bl.closest('.vs');if(p&&p.style.height){const n=bl.querySelectorAll('b').length;p.style.height=(parseFloat(p.style.height)+Math.max(0,n*1.1+.75-2.95)+.3)+'em'}}}
+ finish(q,ok,{});
+}
+function timeLine(){
+ const sec=Math.round((Date.now()-S.t0)/1000),f=s=>`${Math.floor(s/60)} 分 ${s%60} 秒`;
+ if(!S.id.startsWith('r'))return `<p class="sub">這回用了 ${f(sec)}</p>`;
+ const bt=store.get('g3time',{}),prev=bt[S.id],rec=S.score>=8&&(!prev||sec<prev);
+ if(rec){bt[S.id]=sec;store.set('g3time',bt)}
+ return `<p class="sub">讀完 ${S.qs.length} 題用了 <b>${f(sec)}</b>${rec?'・🎉 新紀錄！':prev?`・最快紀錄 ${f(prev)}`:''}${S.score<8?'（答對 8 題以上才算紀錄）':''}</p>`;
+}
+function result(){
+ try{speechSynthesis.cancel()}catch(e){}
+ const n=S.qs.length,st=stars(Math.round(S.score/n*10));
+ if(S.id!=='rv'){const b=store.get('g3best',{});b[S.id]=Math.max(b[S.id]||0,st);store.set('g3best',b)}
+ const msg=st===3?'太厲害了，全部都會！':st===2?'很棒！再練一下就滿分了':st===1?'有進步！把錯的題目再練一次':'沒關係，我們一起再練習';
+ app.innerHTML=`<div class="qcard res"><p class="ask">${esc(S.title)}</p><div class="bigstars">${[0,1,2].map(i=>`<span class="${i<st?'':'off'}" style="animation-delay:${i*.2}s">⭐</span>`).join('')}</div>
+ <div class="score">${S.score} / ${n}</div><p>${msg}</p>${timeLine()}
+ <div class="btns"><button class="btn" id="again">再玩一次</button><button class="btn alt" id="hm">回首頁</button></div>
+ ${S.wrong.length?`<div class="wl"><b>這回答錯的題目</b>${S.wrong.map(q=>`<div class="wi"><div class="q">${q.prompt}</div>${q.dict?`<div>聽寫：${esc(q.word)}</div>`:''}<div class="a row">正確答案：${q.answer}</div><div>${q.explain||''}</div></div>`).join('')}</div>`:''}</div>`;
+ document.getElementById('again').onclick=()=>start(S.id);
+ document.getElementById('hm').onclick=home;
+ window.scrollTo(0,0);
+}
+home();
+</script>
+
+</body></html>
