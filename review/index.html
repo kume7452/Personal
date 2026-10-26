@@ -241,7 +241,7 @@ const CN=['零','一','二','三','四','五','六','七','八','九','十'];
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const W=(p,say,ans,mode,extra={})=>Object.assign({type:'write',id:hid(p+ans+(extra.word||'')),prompt:p,say,ans,mode,answer:mode==='zh'?vs(ans):num(ans)},extra);
 const wSpell=([i,f,a])=>W(`<p class="ask">拼拼看，寫在格子裡</p><div class="eq">${vs(i)}<i>＋</i>${vs(f)}<i>＝</i><span class="vb">？</span></div>`,'把兩個注音拼起來，寫在格子裡',a,'zh',{sub:'zh',explain:`<span class="ex">${vs(i)}＋${vs(f)}拼成${vs(a)}</span>`});
-const wPic=([e,a,word])=>W(`<p class="ask">看圖，寫出注音</p><div class="pic">${e}</div>`,'看看圖，寫出注音',a,'zh',{sub:'zh',explain:`<span class="ex">這是「${word}」，注音是${vs(a)}</span>`});
+const wPic=([e,a,word])=>W(`<p class="ask">看圖，寫出注音</p><div class="pic">${e}</div><p class="ask" style="font-size:26px">「${word}」</p>`,`${word}，寫出${word}的注音`,a,'zh',{sub:'zh',explain:`<span class="ex">這是「${word}」，注音是${vs(a)}</span>`});
 const wDict=([word,a,say])=>W(`<p class="ask">聽寫：仔細聽，寫出注音</p>`,say,a,'zh',{sub:'zh',dict:true,word,explain:`<span class="ex">「${word}」的注音是${vs(a)}</span>`});
 
 const D1=[['手','ㄕㄡˇ','手，手拉手的手'],['拉','ㄌㄚ','拉，手拉手的拉'],['哈哈','ㄏㄚ ㄏㄚ','哈哈，哈哈笑的哈哈'],['大','ㄉㄚˋ','大，大家的大'],['好','ㄏㄠˇ','好，老師好的好'],['老師','ㄌㄠˇ ㄕ','老師'],['沙子','ㄕㄚ ˙ㄗ','沙子'],['獅子','ㄕ ˙ㄗ','獅子'],['手錶','ㄕㄡˇ ㄅㄧㄠˇ','手錶'],['大手','ㄉㄚˋ ㄕㄡˇ','大手']];
@@ -276,7 +276,7 @@ function mutate(zy){const sy=zy.split(' ');for(let k=0;k<40;k++){const i=R(0,sy.
  const s=r.join(' ');if(s!==zy)return s}return null}
 function wrongs(zy,n){const s=new Set();let k=0;while(s.size<n&&k++<80){const m=mutate(zy);if(m&&m!==zy)s.add(m)}return [...s]}
 const TN={'':'一聲','ˊ':'二聲 ˊ','ˇ':'三聲 ˇ','ˋ':'四聲 ˋ','˙':'輕聲 ˙'};
-const z_pic=()=>{const [w,zy,e]=pick(WORDS);return mk(`<p class="ask">看圖選注音</p><div class="pic">${e}</div><p class="sub">${w}</p>`,`${w}，選出正確的注音`,vs(zy),wrongs(zy,3).map(x=>vs(x)),{sub:'zh',explain:`<span class="ex">「${w}」的注音是${vs(zy)}</span>`})};
+const z_pic=()=>{const [w,zy,e]=pick(WORDS);return mk(`<p class="ask">看圖選注音</p><div class="pic">${e}</div><p class="ask" style="font-size:26px">「${w}」</p>`,`${w}，選出正確的注音`,vs(zy),wrongs(zy,3).map(x=>vs(x)),{sub:'zh',explain:`<span class="ex">「${w}」的注音是${vs(zy)}</span>`})};
 const z_tone=()=>{const [w,zy,e]=pick(WORDS),sy=zy.split(' '),i=R(0,sy.length-1),p=parseSyl(sy[i]),key=p.nt?'˙':p.t,ch=[...w][i];
  const others=shuffle(Object.keys(TN).filter(k=>k!==key&&(k!=='˙'||sy.length>1))).slice(0,3);
  return mk(`<p class="ask">「${w}」的「${ch}」是第幾聲？</p><div class="pic">${e}</div><div class="sent">${vs(p.body)}</div>`,`${w}的${ch}，是第幾聲？`,TN[key],others.map(k=>TN[k]),{sub:'zh',explain:`<span class="ex">「${w}」的注音是${vs(zy)}</span>`})};
