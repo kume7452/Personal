@@ -174,7 +174,7 @@ function mk(prompt,say,answer,wrongs,extra={}){return Object.assign({id:hid(prom
 let VOICES=[];function loadV(){try{VOICES=speechSynthesis.getVoices()||[]}catch(e){}}loadV();try{speechSynthesis.onvoiceschanged=loadV}catch(e){}
 function pickVoice(lang){const L=v=>(v.lang||'').replace('_','-').toLowerCase(),pref=lang==='en'?['en-us','en-gb','en']:['zh-tw','zh-hant','cmn-hant','zh'];for(const p of pref){const v=VOICES.find(x=>L(x).startsWith(p)&&/google|samantha|siri|natural/i.test(x.name))||VOICES.find(x=>L(x).startsWith(p));if(v)return v}return null}
 const hasVoice=lang=>!VOICES.length||!!pickVoice(lang);
-function speak(t,lang){try{speechSynthesis.cancel();setTimeout(()=>{const u=new SpeechSynthesisUtterance(t);u.lang=lang==='en'?'en-US':'zh-TW';const v=pickVoice(lang);if(v)u.voice=v;u.rate=lang==='en'?.85:.9;speechSynthesis.speak(u)},120)}catch(e){}}
+function speak(t,lang){try{speechSynthesis.cancel();const parts=Array.isArray(t)?t:[[t,lang]];setTimeout(()=>parts.forEach(([x,l])=>{const u=new SpeechSynthesisUtterance(x);u.lang=l==='en'?'en-US':'zh-TW';const v=pickVoice(l);if(v)u.voice=v;u.rate=l==='en'?.85:.9;speechSynthesis.speak(u)}),120)}catch(e){}}
 
 /* ---------- 國語 ---------- */
 const spellQ=([i,f,a,w])=>mk(`<p class="ask">拼拼看</p><div class="eq">${vs(i)}<i>＋</i>${vs(f)}<i>＝</i><span class="vb blank">？</span></div>`,'把兩個注音拼起來，選出正確的答案',vs(a),w.map(x=>vs(x)),{sub:'zh',fill:sylInner(a),explain:`<span class="ex">${vs(i)}＋${vs(f)}拼成${vs(a)}</span>`});
@@ -380,6 +380,7 @@ const dictRound=d=>shuffle(d).slice(0,10).map(wDict);
 const LT=s=>`<span class="ltr">${s}</span>`;
 const ENUM=['zero','one','two','three','four','five','six','seven','eight','nine','ten'];
 const LET='ABCDEF';
+const LN={A:'ay',B:'bee',C:'see',D:'dee',E:'ee',F:'eff'};
 const EW={A:[['apple','🍎']],B:[['book','📘']],C:[['cup','☕']],D:[['dog','🐶']],E:[['egg','🥚']],F:[['fish','🐟']]};
 const EQ=(p,say,a,w,ex,extra={})=>mk(p,say,a,w,Object.assign({sub:'en',lang:'en',dict:!!say,explain:ex},extra));
 const e_num=()=>{const n=R(1,10),ws=shuffle(Array.from({length:10},(_,i)=>i+1).filter(x=>x!==n)).slice(0,3);
@@ -388,7 +389,7 @@ const e_count=()=>{const n=R(1,10),[e]=pick(ITEMS),ws=shuffle(Array.from({length
  return EQ(`<p class="ask">數一數，有幾個？聽一聽，選出正確的英文</p>${grp(n,e)}<p class="sub">按「🔊 再聽一次」會依序念出 ①②③</p>`,all.map((x,i)=>`Number ${i+1}. ${ENUM[x]}.`).join(' '),`①②③`[all.indexOf(n)]+' '+LT(ENUM[n]),all.filter(x=>x!==n).map(x=>`①②③`[all.indexOf(x)]+' '+LT(ENUM[x])),`共 ${n} 個，英文是 ${LT(ENUM[n])}。`)};
 const caseOf=()=>Math.random()<.5;
 const e_name=()=>{const L=pick([...LET]),up=caseOf(),f=x=>up?x:x.toLowerCase(),ws=shuffle([...LET].filter(x=>x!==L)).slice(0,3);
- return EQ(`<p class="ask">仔細聽，選出聽到的${up?'大寫':'小寫'}字母</p>`,`The letter ${L}. ${L}.`,LT(f(L)),ws.map(x=>LT(f(x))),`字母 ${LT(L+L.toLowerCase())}`)};
+ return EQ(`<p class="ask">仔細聽，選出聽到的${up?'大寫':'小寫'}字母</p>`,`${LN[L]}. ${LN[L]}.`,LT(f(L)),ws.map(x=>LT(f(x))),`字母 ${LT(L+L.toLowerCase())}`)};
 const e_match=()=>{const L=pick([...LET]),up=caseOf(),show=up?L:L.toLowerCase(),f=x=>up?x.toLowerCase():x,pool=L==='B'||L==='D'?['B','D',...shuffle([...LET].filter(x=>x!=='B'&&x!=='D')).slice(0,2)]:[L,...shuffle([...LET].filter(x=>x!==L)).slice(0,3)];
  return mk(`<p class="ask">${LT(show)} 的${up?'小寫':'大寫'}是哪一個？</p><div class="pic">${LT(show)}</div>`,'',LT(f(L)),pool.filter(x=>x!==L).map(x=>LT(f(x))),{sub:'en',explain:`${LT(L)} 的小寫是 ${LT(L.toLowerCase())}。${L==='B'||L==='D'?'小心 b 和 d 方向相反！':''}`})};
 const e_order=()=>{const up=caseOf(),f=x=>up?x:x.toLowerCase(),s=R(0,2),seq=[...LET].slice(s,s+4),k=R(0,3),ans=seq[k],ws=shuffle([...LET].filter(x=>!seq.includes(x)||x!==ans).filter(x=>x!==ans)).slice(0,3);
@@ -407,7 +408,7 @@ const e_dlg=()=>{const [q,a,w]=pick(DLG),opts=shuffle([a,...w]);
  return EQ(`<p class="ask">老師說：</p><div class="bub">${LT(esc(q))}</div><p class="ask">你要怎麼回答？</p><p class="sub">按「🔊 再聽一次」會念題目和 ①②③ 三個選項</p>`,`${q} ... Number 1. ${opts[0]} ... Number 2. ${opts[1]} ... Number 3. ${opts[2]}`,`${'①②③'[opts.indexOf(a)]} ${LT(esc(a))}`,w.map(x=>`${'①②③'[opts.indexOf(x)]} ${LT(esc(x))}`),`問「${esc(q)}」，回答「${esc(a)}」。`)};
 const EW_=(p,say,ans,ex,extra={})=>Object.assign({type:'write',id:hid(p+ans+say),prompt:p,say,ans,mode:'en',answer:LT(ans),sub:'en',lang:'en',explain:ex},extra);
 const e_write=()=>{const L=pick([...LET]),r=Math.random();
- if(r<.4){const up=caseOf(),a=up?L:L.toLowerCase();return EW_(`<p class="ask">聽一聽，寫出${up?'大寫':'小寫'}字母</p>`,`${up?'Capital letter':'Small letter'} ${L}. ${L}.`,a,`${up?'大寫':'小寫'} ${LT(a)}。`,{dict:true,word:(up?'大寫 ':'小寫 ')+a,parentSay:(up?'大寫 ':'小寫 ')+a})}
+ if(r<.4){const up=caseOf(),a=up?L:L.toLowerCase();return EW_(`<p class="ask">聽一聽，寫出${up?'大寫':'小寫'}字母</p>`,[[up?'大寫':'小寫','zh'],[`${LN[L]}. ${LN[L]}.`,'en']],a,`${up?'大寫':'小寫'} ${LT(a)}。`,{dict:true,word:(up?'大寫 ':'小寫 ')+a,parentSay:(up?'大寫 ':'小寫 ')+L})}
  if(r<.8){const up=caseOf(),show=up?L:L.toLowerCase(),a=up?L.toLowerCase():L;return EW_(`<p class="ask">${LT(show)} 的${up?'小寫':'大寫'}怎麼寫？寫在格線上</p><div class="pic">${LT(show)}</div>`,'',a,`${LT(show)} 的${up?'小寫':'大寫'}是 ${LT(a)}。注意寫在格線的正確位置。`)}
  return EW_(`<p class="ask">寫出大寫和小寫：</p><div class="pic">${LT(L)} ${LT(L.toLowerCase())}</div><p class="sub">先寫大寫，再寫小寫，寫在同一格裡</p>`,'',L+L.toLowerCase(),`${LT(L+L.toLowerCase())}，大寫從第一線寫到第三線。`)};
 const EC=[e_num,e_count,e_name,e_match,e_order,e_word,e_first,e_dlg,e_mean,e_sit];
@@ -531,7 +532,7 @@ function quiz(keep){
  <div class="qcard"><span class="tag ${q.sub}">${q.sub==='zh'?'國語':q.sub==='en'?'英語':'數學'}${isW?'・手寫':''}・${esc(S.title)}</span><br>
  ${q.dict||q.read||!q.say?'':('speechSynthesis' in window?'<button class="speak" id="spk">🔊 聽題目</button>':'')}
  <div id="qp">${q.prompt}</div>
- ${q.dict?`<button class="say" id="spk">🔊 再聽一次</button>${q.lang==='en'&&!hasVoice('en')?'<p class="sub" style="color:var(--bad)">這台裝置沒有英文語音，請展開下方「家長唸題用」由家長唸。</p>':''}<details class="parent"><summary>家長唸題用</summary>請唸：「${esc(q.say)}」</details>`:''}
+ ${q.dict?`<button class="say" id="spk">🔊 再聽一次</button>${q.lang==='en'&&!hasVoice('en')?'<p class="sub" style="color:var(--bad)">這台裝置沒有英文語音，請展開下方「家長唸題用」由家長唸。</p>':''}<details class="parent"><summary>家長唸題用</summary>請唸：「${esc(q.parentSay||q.say)}」</details>`:''}
  ${isW?`<div class="pads" id="pads"></div><div class="tools"><button class="tool" id="undo">↶ 擦掉上一筆</button><button class="tool" id="clr">🧽 全部擦掉</button></div>
   <div class="acts" id="acts">${AI_OK?'<button class="btn" id="ai">✍️ 寫好了，請系統批改</button><button class="btn alt" id="self">自己對答案</button>':'<button class="btn" id="self">✍️ 寫好了，對答案</button>'}</div>`
  :`<div class="choices">${q.choices.map((c,k)=>`<button class="choice" data-k="${k}">${c}</button>`).join('')}</div>`}
