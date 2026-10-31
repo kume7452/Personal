@@ -173,7 +173,10 @@ const bp=s=>vs(s);
 const num=n=>`<span class="num">${n}</span>`;
 const LBL=['ㄅ','ㄆ','ㄇ'];
 function mk(prompt,say,answer,wrongs,extra={}){return Object.assign({id:hid(prompt+answer),prompt,say,answer,choices:shuffle([answer,...wrongs])},extra)}
-function speak(t){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='zh-TW';u.rate=.9;speechSynthesis.speak(u)}catch(e){}}
+let VOICES=[];function loadV(){try{VOICES=speechSynthesis.getVoices()||[]}catch(e){}}loadV();try{speechSynthesis.onvoiceschanged=loadV}catch(e){}
+function pickVoice(lang){const L=v=>(v.lang||'').replace('_','-').toLowerCase(),pref=lang==='en'?['en-us','en-gb','en']:['zh-tw','zh-hant','cmn-hant','zh'];for(const p of pref){const v=VOICES.find(x=>L(x).startsWith(p)&&/google|samantha|siri|natural/i.test(x.name))||VOICES.find(x=>L(x).startsWith(p));if(v)return v}return null}
+const hasVoice=lang=>!VOICES.length||!!pickVoice(lang);
+function speak(t,lang){try{speechSynthesis.cancel();setTimeout(()=>{const u=new SpeechSynthesisUtterance(t);u.lang=lang==='en'?'en-US':'zh-TW';const v=pickVoice(lang);if(v)u.voice=v;u.rate=lang==='en'?.85:.9;speechSynthesis.speak(u)},120)}catch(e){}}
 
 /* ---------- 共用 ---------- */
 const CN=['零','一','二','三','四','五','六','七','八','九','十'];
