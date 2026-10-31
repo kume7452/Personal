@@ -682,6 +682,11 @@ async function hwGradeText(q,lang){
   if(read===q.ans)return {ok:true,read,tip:'寫得很正確！'};
   const near=res.every((c,i)=>c.slice(0,5).some(s=>s.trim()[0]===exp[i]));
   return {ok:false,unsure:near,read,tip:near?'系統不太確定，請家長看一下是不是寫對了。':'和正確答案不一樣，看看哪個部件或筆畫寫錯了。'};}
+ if(q.mode==='en'){const P=pads[0],res=await hwRec([{writing_guide:{writing_area_width:P.w,writing_area_height:P.h},ink:toInk(P.strokes),language:'en'}]);
+  const cands=res[0].map(x=>x.replace(/\s/g,'')),read=cands[0]||'？',same=(x,y)=>x===y||(/^[cC]+$/.test(y)&&x.toLowerCase()===y.toLowerCase());
+  if(same(read,q.ans))return {ok:true,read,tip:'寫得很正確！記得寫在格線的正確位置喔。'};
+  const near=cands.slice(0,5).some(x=>same(x,q.ans)||x.toLowerCase()===q.ans.toLowerCase());
+  return {ok:false,unsure:near,read,tip:near?'系統不太確定大小寫或位置，請家長看一下。':`正確答案是 ${q.ans}，${/[bd]/i.test(q.ans)?'小心 b 和 d 不要寫反。':'再看一次課本的寫法。'}`};}
  const P=pads[0],res=await hwRec([{writing_guide:{writing_area_width:P.w,writing_area_height:P.h},ink:toInk(P.strokes),language:'en'}]);
  const cands=res[0].map(s=>s.replace(/\s/g,'').replace(/[oO]/g,'0').replace(/[lI|]/g,'1').replace(/[sS]/g,'5').replace(/[zZ]/g,'2'));
  const read=cands[0]||'？';
